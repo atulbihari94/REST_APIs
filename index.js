@@ -34,13 +34,11 @@ app.get('/api/cources/:id', (req, res) => {
 })
 
 app.post('/api/cources', (req, res) => {
-    const schema = Joi.object({
-        name: Joi.string().min(3).required()
-    })
-
-    const result = schema.validate(req.body);
-    if (result.error) {
-        res.status(400).send(result.error.details[0].message)
+    const {
+        error
+    } = validateCource(req);
+    if (error) {
+        res.status(400).send(error.details[0].message)
         return
     }
 
@@ -51,6 +49,28 @@ app.post('/api/cources', (req, res) => {
     cources.push(cource);
     res.status(201).send(cource);
 });
+
+app.put('/api/cources/:id', (req, res) => {
+    const cource = cources.find(c => c.id === parseInt(req.params.id));
+    if (!cource)
+        res.status(404).send('The Cource wth the given ID was not found');
+    const {
+        error
+    } = validateCource(req);
+    if (error) {
+        res.status(400).send(error.details[0].message)
+        return
+    }
+    cource.name = req.body.name;
+    res.send(cource);
+})
+
+function validateCource(req) {
+    const schema = Joi.object({
+        name: Joi.string().min(3).required()
+    })
+    return schema.validate(req.body);
+}
 
 const port = process.env.PORT || 3001;
 
