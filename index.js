@@ -37,10 +37,8 @@ app.post('/api/cources', (req, res) => {
     const {
         error
     } = validateCource(req);
-    if (error) {
-        res.status(400).send(error.details[0].message)
-        return
-    }
+    if (error) return res.status(400).send(error.details[0].message)
+
 
     const cource = {
         id: cources.length + 1,
@@ -52,16 +50,21 @@ app.post('/api/cources', (req, res) => {
 
 app.put('/api/cources/:id', (req, res) => {
     const cource = cources.find(c => c.id === parseInt(req.params.id));
-    if (!cource)
-        res.status(404).send('The Cource wth the given ID was not found');
+    if (!cource) return res.status(404).send('The Cource wth the given ID was not found');
+
     const {
         error
     } = validateCource(req);
-    if (error) {
-        res.status(400).send(error.details[0].message)
-        return
-    }
+    if (error) return res.status(400).send(error.details[0].message)
     cource.name = req.body.name;
+    res.send(cource);
+})
+
+app.delete('/api/cources/:id', (req, res) => {
+    const cource = cources.find(c => c.id === parseInt(req.params.id));
+    if (!cource) return res.status(404).send('The Cource wth the given ID was not found');
+    const index = cources.indexOf(cource);
+    cources.splice(index, 1);
     res.send(cource);
 })
 
